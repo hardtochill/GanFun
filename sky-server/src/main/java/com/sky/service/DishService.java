@@ -21,7 +21,7 @@ public interface DishService {
      * @param id
      * @return
      */
-    Dish getById(Long id);
+    DishVO getByIdWithFlavor(Long id);
 
     /**
      * 根据分类id查询菜品
@@ -42,4 +42,10 @@ public interface DishService {
      * @param ids
      */
     void deleteBatch(List<Long> ids);
+
+    /**
+     * 修改菜品
+     * @param dishDTO
+     */
+    void updateWithFlavor(DishDTO dishDTO);
 }
