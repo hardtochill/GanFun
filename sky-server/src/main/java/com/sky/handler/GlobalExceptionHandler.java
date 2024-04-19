@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
     /**
      * SQLIntegrityConstraintViolationException
-     * 捕获新增员工异常异常
+     * 捕获新增员工异常
      */
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
