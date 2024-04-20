@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "套餐管理接口")
 @RestController
 @RequestMapping("/admin/setmeal")
@@ -44,5 +46,18 @@ public class SetmealController {
         log.info("套餐分页查询：{}",setmealPageQueryDTO);
         PageResult pageResult = setmealService.listByPageWithCategoryName(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 根据id删除套餐
+     * @param ids
+     * @return
+     */
+    @ApiOperation("删除套餐")
+    @DeleteMapping
+    public Result deleteByIds(@RequestParam List<Long> ids){
+        log.info("删除套餐：{}",ids);
+        setmealService.deleteByIds(ids);
+        return Result.success();
     }
 }

@@ -18,4 +18,11 @@
         (#{sd.setmealId},#{sd.dishId},#{sd.name},#{sd.price},#{sd.copies})
         </foreach>
     </insert>
+    <!--根据套餐id批量删除数据-->
+    <delete id="deleteBySetmealIds">
+        delete from setmeal_dish where setmeal_id in 
+        <foreach collection="setmealIds" item="setmealId" separator="," open="(" close=")">
+            #{setmealId}
+        </foreach>
+    </delete>
 </mapper>

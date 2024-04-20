@@ -56,11 +56,11 @@ public interface DishMapper {
     Page<DishVO> listByPage(DishPageQueryDTO dishPageQueryDTO);
 
     /**
-     * 根据id菜品
+     * 根据id删除菜品
      * @param id
-     */
+     *//*
     @Delete("delete from dish where id=#{id}")
-    void deleteById(Long id);
+    void deleteById(Long id);*/
 
     /**
      * 批量删除菜品
