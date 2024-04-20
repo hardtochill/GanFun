@@ -147,4 +147,16 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(dishFlavorList);
         }
     }
+
+    /**
+     * 菜品起售停售
+     * @param id
+     * @param status
+     */
+    public void updateStatus(Long id,int status){
+        Dish dish = new Dish();
+        dish.setId(id);
+        dish.setStatus(status);
+        dishMapper.update(dish);
+    }
 }

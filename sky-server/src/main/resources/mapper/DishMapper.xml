@@ -41,6 +41,7 @@
             <if test="image!=null">image=#{image},</if>
             <if test="description!=null">description=#{description},</if>
             <if test="status!=null">status=#{status},</if>
+            <if test="updateTime!=null">update_time=#{updateTime}</if>
         </set>
         where id = #{id}
     </update>
