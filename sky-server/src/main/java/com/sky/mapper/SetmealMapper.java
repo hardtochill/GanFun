@@ -49,4 +49,11 @@ public interface SetmealMapper {
      * @param ids
      */
     void deleteByIds(List<Long> ids);
+
+    /**
+     * 查询套餐信息和分类名字
+     * @param id
+     * @return
+     */
+    SetmealVO selectByIdWithCategoryname(Long id);
 }

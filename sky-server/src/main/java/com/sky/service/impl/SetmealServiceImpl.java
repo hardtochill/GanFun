@@ -85,4 +85,17 @@ public class SetmealServiceImpl implements SetmealService {
             throw new DeletionNotAllowedException(MessageConstant.SETMEAL_DOESNT_EXIT);
         }
     }
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
+    public SetmealVO getByIdWithCategoryNameAndDishes(Long id){
+        //查询套餐表信息 + 分类表名字字段
+        SetmealVO setmealVO = setmealMapper.selectByIdWithCategoryname(id);
+        //查询套餐-菜品表信息
+        List<SetmealDish> setmealDishList = setMealDishMapper.selectBySetmealId(setmealVO.getId());
+        setmealVO.setSetmealDishes(setmealDishList);
+        return setmealVO;
+    }
 }

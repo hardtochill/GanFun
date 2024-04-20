@@ -22,6 +22,15 @@
         </where>
         order by s.create_time desc
     </select>
+    <!--查询套餐信息和分类名字-->
+    <select id="selectByIdWithCategoryname" resultType="com.sky.vo.SetmealVO">
+        select s.*,c.name categoryName
+        from setmeal s
+        left join category c
+        on s.category_id = c.id
+        where
+        s.id = #{id}
+    </select>
     <!--批量删除-->
     <delete id="deleteByIds">
         delete from setmeal where id in
