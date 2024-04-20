@@ -128,6 +128,9 @@ public class SetmealServiceImpl implements SetmealService {
      * @param status
      */
     public void startOrstop(Long id, int status){
-
+        Setmeal setmeal = new Setmeal();
+        setmeal.setId(id);
+        setmeal.setStatus(status);
+        setmealMapper.update(setmeal);
     }
 }
