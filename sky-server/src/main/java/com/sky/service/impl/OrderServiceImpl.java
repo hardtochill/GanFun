@@ -1,9 +1,12 @@
 package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersDTO;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -11,6 +14,7 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
@@ -157,5 +161,40 @@ public class OrderServiceImpl implements OrderService {
 
         orderMapper.update(orders);
     }
-
+    /**
+     * 历史订单查询
+     * @param page
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    public PageResult pageQuery(Integer page, Integer pageSize, Integer status){
+        Long userId = BaseContext.getCurrentId();
+        //——1.封装查询对象，设置分页查询
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setPage(page);
+        ordersPageQueryDTO.setPageSize(pageSize);
+        ordersPageQueryDTO.setStatus(status);
+        ordersPageQueryDTO.setUserId(userId);
+        PageHelper.startPage(page,pageSize);
+        //——2.查询订单表，返回订单列表
+        Page<Orders> ordersPage = orderMapper.listByPage(ordersPageQueryDTO);
+        List<OrderVO> orderVOList = new ArrayList<>();
+        //——3.对订单列表的每个订单，查询订单明细表
+        if(ordersPage!=null && ordersPage.size()>0){
+            for (Orders orders1 : ordersPage) {
+                List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orders1.getId());
+                OrderVO orderVO = new OrderVO();
+                /*OrderVO类继承自Orders类，因此OrderVO类中实际是拥有有Orders类的所有属性
+                *而显示声明的两个是属于OrderVO自己的
+                * 所以要做属性拷贝设置OrderVO那些继承自Orders的属性值
+                */
+                BeanUtils.copyProperties(orders1,orderVO);
+                orderVO.setOrderDetailList(orderDetailList);
+                orderVOList.add(orderVO);
+            }
+        }
+        //——4.封装视图对象并返回
+        return new PageResult(ordersPage.getTotal(),orderVOList);
+    }
 }
