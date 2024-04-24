@@ -213,4 +213,47 @@ public class OrderServiceImpl implements OrderService {
         orderVO.setOrderDetailList(orderDetailList);
         return orderVO;
     }
+    /**
+     * 取消订单
+     * @param orderId
+     */
+    public void cancelOrder(Long orderId){
+        /*-待支付和待接单状态下，用户可直接取消订单
+          - 商家已接单状态下，用户取消订单需电话沟通商家
+          - 派送中状态下，用户取消订单需电话沟通商家
+          - 如果在待接单状态下取消订单，需要给用户退款
+          - 取消订单后需要将订单状态修改为“已取消”
+        */
+        //——1.取出订单，查看订单是否存在
+        Orders orders = orderMapper.getById(orderId);
+        if(orders==null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        Integer status = orders.getStatus();
+        //——2.查询订单状态
+        //若为已接单状态，抛异常
+        if(status>Orders.CONFIRMED){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //创建退单对象，用于更新表中已取消的订单
+        Orders cancelOrder = new Orders();
+        cancelOrder.setId(orderId);
+        //若为待接单状态，调用微信接口退款，并修改订单状态
+        if (orders.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            /*//调用微信支付退款接口
+            weChatPayUtil.refund(
+                    orders.getNumber(), //商户订单号
+                    orders.getNumber(), //商户退款单号
+                    new BigDecimal(0.01),//退款金额，单位 元
+                    new BigDecimal(0.01));//原订单金额*/
+
+            //支付状态修改为 退款
+            cancelOrder.setPayStatus(Orders.REFUND);
+        }
+        //——4.补充已取消订单对象的信息，并替换原订单数据
+        cancelOrder.setStatus(Orders.CANCELLED);
+        cancelOrder.setCancelReason("用户取消");
+        cancelOrder.setCancelTime(LocalDateTime.now());
+        orderMapper.update(cancelOrder);
+    }
 }
