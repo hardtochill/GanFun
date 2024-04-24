@@ -197,4 +197,20 @@ public class OrderServiceImpl implements OrderService {
         //——4.封装视图对象并返回
         return new PageResult(ordersPage.getTotal(),orderVOList);
     }
+    /**
+     * 查询订单详情接口
+     * @param orderId
+     * @return
+     */
+    public OrderVO getOrderDetails(Long orderId){
+        //查询订单表获取订单对象
+        Orders orders = orderMapper.getById(orderId);
+        //查询订单详情表获取订单详情列表
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orderId);
+        //构造视图对象返回
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders,orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
+    }
 }

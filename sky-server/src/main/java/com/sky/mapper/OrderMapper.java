@@ -45,4 +45,11 @@ public interface OrderMapper {
      * @return
      */
     Page<Orders> listByPage(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 根据id查询数据
+     * @param orderId
+     */
+    @Select("select * from orders where id=#{orderId}")
+    Orders getById(Long orderId);
 }
