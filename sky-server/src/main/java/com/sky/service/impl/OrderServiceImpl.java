@@ -279,4 +279,40 @@ public class OrderServiceImpl implements OrderService {
         //——3.插入购物车表
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
+    /**
+     * 订单搜索
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO){
+        //——1.分页查询订单表，获取数据列表
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+        Page<Orders> ordersPage = orderMapper.listByPage(ordersPageQueryDTO);
+        List<OrderVO> orderVOList = new ArrayList<>();
+        //——2.将订单列表转成OrderVO列表
+        for (Orders orders1 : ordersPage) {
+            //构造orderVO对象
+            OrderVO orderVO = new OrderVO();
+            BeanUtils.copyProperties(orders1,orderVO);
+            //根据订单id获取订单详情数据和订单菜品信息
+            List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orders1.getId());
+            orderVO.setOrderDetailList(orderDetailList);
+            orderVO.setOrderDishes(getOrderDishes(orderDetailList));
+            orderVOList.add(orderVO);
+        }
+        return new PageResult(ordersPage.getTotal(),orderVOList);
+    }
+
+    /**
+     * 根据订单详情获取订单菜品信息
+     * @param orderDetailList
+     * @return
+     */
+    public String getOrderDishes(List<OrderDetail> orderDetailList){
+        StringBuilder sb = new StringBuilder();
+        for (OrderDetail orderDetail : orderDetailList) {
+            sb.append(orderDetail.getName()+"*"+orderDetail.getNumber()+";");
+        }
+        return sb.toString();
+    }
 }

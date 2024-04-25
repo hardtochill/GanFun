@@ -21,7 +21,7 @@ public class OrderDetail implements Serializable {
 
     private Long id;
 
-    //名称
+    //菜品或套餐名称
     private String name;
 
     //订单id
