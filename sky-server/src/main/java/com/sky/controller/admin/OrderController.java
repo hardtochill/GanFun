@@ -4,6 +4,7 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Api(tags = "商家订单接口")
+@Api(tags = "订单管理接口")
 @RestController("adminOrderController")
 @RequestMapping("/admin/order")
 @Slf4j
@@ -34,5 +35,12 @@ public class OrderController {
         log.info("订单搜索：{}",ordersPageQueryDTO);
         PageResult pageResult = orderService.conditionSearch(ordersPageQueryDTO);
         return Result.success(pageResult);
+    }
+    @GetMapping("/statistics")
+    @ApiOperation("各个状态的订单数量统计")
+    public Result<OrderStatisticsVO> statistics(){
+        log.info("各个状态的订单数量统计");
+        OrderStatisticsVO orderStatisticsVO = orderService.statics();
+        return Result.success(orderStatisticsVO);
     }
 }
