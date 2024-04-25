@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.IdConstant;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersDTO;
@@ -198,20 +199,36 @@ public class OrderServiceImpl implements OrderService {
         //——4.封装视图对象并返回
         return new PageResult(ordersPage.getTotal(),orderVOList);
     }
+
     /**
      * 查询订单详情接口
      * @param orderId
+     * @param identity
      * @return
      */
-    public OrderVO getOrderDetails(Long orderId){
+    public OrderVO getOrderDetails(Long orderId,Integer identity){
         //查询订单表获取订单对象
         Orders orders = orderMapper.getById(orderId);
         //查询订单详情表获取订单详情列表
         List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orderId);
-        //构造视图对象返回
+        //构造视图对象
         OrderVO orderVO = new OrderVO();
         BeanUtils.copyProperties(orders,orderVO);
         orderVO.setOrderDetailList(orderDetailList);
+        orderVO.setAddress(addressBookMapper.getById(orderVO.getAddressBookId()).getDetail());
+        //对用户端查询订单操作，做姓名和号码部分隐藏处理
+        if(identity==IdConstant.user){
+            String name = orderVO.getConsignee();
+            String phone = orderVO.getPhone();
+            StringBuilder sb = new StringBuilder();
+            sb.append(name.charAt(0));
+            for(int i=1;i<name.length();i++){
+                sb.append("*");
+            }
+            phone = phone.substring(0,3)+"****"+phone.substring(7,phone.length());
+            orderVO.setConsignee(sb.toString());
+            orderVO.setPhone(phone);
+        }
         return orderVO;
     }
     /**
@@ -299,6 +316,7 @@ public class OrderServiceImpl implements OrderService {
             List<OrderDetail> orderDetailList = orderDetailMapper.selectByOrderId(orders1.getId());
             orderVO.setOrderDetailList(orderDetailList);
             orderVO.setOrderDishes(getOrderDishes(orderDetailList));
+            orderVO.setAddress(addressBookMapper.getById(orderVO.getAddressBookId()).getDetail());
             orderVOList.add(orderVO);
         }
         return new PageResult(ordersPage.getTotal(),orderVOList);
@@ -330,4 +348,5 @@ public class OrderServiceImpl implements OrderService {
         orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
         return orderStatisticsVO;
     }
+
 }

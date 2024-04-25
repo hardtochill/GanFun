@@ -44,9 +44,10 @@ public interface OrderService {
     /**
      * 查询订单详情接口
      * @param orderId
+     * @param identity
      * @return
      */
-    OrderVO getOrderDetails(Long orderId);
+    OrderVO getOrderDetails(Long orderId,Integer identity);
 
     /**
      * 取消订单

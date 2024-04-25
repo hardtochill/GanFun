@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.sky.constant.IdConstant;
 import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
@@ -73,7 +74,7 @@ public class OrderController {
     @ApiOperation("查询订单详情接口")
     public Result<OrderVO> details(@PathVariable Long id){
         log.info("查询订单详情：{}",id);
-        OrderVO orderVO = orderService.getOrderDetails(id);
+        OrderVO orderVO = orderService.getOrderDetails(id, IdConstant.user);
         return Result.success(orderVO);
     }
 
