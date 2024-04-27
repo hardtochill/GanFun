@@ -406,4 +406,39 @@ public class OrderServiceImpl implements OrderService {
         cancelOrders.setCancelTime(LocalDateTime.now());
         orderMapper.update(cancelOrders);
     }
+    /**
+     * 派送订单
+     * @param orderId
+     */
+    public void deliver(Long orderId){
+        //——1.取出订单
+        Orders orders = orderMapper.getById(orderId);
+        //——2.判断：订单是否存在、订单是否处于已接单状态
+        if(orders==null || !orders.getStatus().equals(Orders.CONFIRMED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //——3.修改订单状态
+        Orders deliveryOrder = new Orders();
+        deliveryOrder.setId(orderId);
+        deliveryOrder.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(deliveryOrder);
+    }
+    /**
+     * 完成订单
+     * @param orderId
+     */
+    public void complete(Long orderId){
+        //——1.取出订单
+        Orders orders = orderMapper.getById(orderId);
+        //——2.只有订单存在且处于派送中，才能完成
+        if(orders==null || !orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //——3.修改订单状态
+        Orders completeOrder = new Orders();
+        completeOrder.setId(orderId);
+        completeOrder.setStatus(Orders.COMPLETED);
+        completeOrder.setDeliveryTime(LocalDateTime.now());
+        orderMapper.update(completeOrder);
+    }
 }
