@@ -233,7 +233,7 @@ public class OrderServiceImpl implements OrderService {
      * 用户取消订单
      * @param orderId
      */
-    public void cancelOrder(Long orderId){
+    public void userCancelOrder(Long orderId){
         /*-待支付和待接单状态下，用户可直接取消订单
           - 商家已接单状态下，用户取消订单需电话沟通商家
           - 派送中状态下，用户取消订单需电话沟通商家
@@ -372,7 +372,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //——3.查询订单支付状态，若订单已支付，则需要退款
         if(orders.getPayStatus().equals(Orders.PAID)){
-            log.info("为用户退款");
+            log.info("商家为用户退款");
         }
         //——4.更新订单状态
         Orders rejectionOrder = new Orders();
@@ -381,5 +381,29 @@ public class OrderServiceImpl implements OrderService {
         rejectionOrder.setRejectionReason(rejectReason);
         rejectionOrder.setCancelTime(LocalDateTime.now());
         orderMapper.update(rejectionOrder);
+    }
+    /**
+     * 商家取消订单
+     * @param ordersCancelDTO
+     */
+    public void adminCancelOrder(OrdersCancelDTO ordersCancelDTO){
+        Long orderId = ordersCancelDTO.getId();
+        String cancelReason = ordersCancelDTO.getCancelReason();
+        //——1.查询要取消的订单
+        Orders orders = orderMapper.getById(orderId);
+        if(orders==null){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //——2.查询订单支付状态，看是否需要退款
+        if(orders.getPayStatus().equals(Orders.PAID)){
+            log.info("商家为用户退款");
+        }
+        //——3.更新订单状态
+        Orders cancelOrders = new Orders();
+        cancelOrders.setId(orderId);
+        cancelOrders.setStatus(Orders.CANCELLED);
+        cancelOrders.setCancelReason(cancelReason);
+        cancelOrders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(cancelOrders);
     }
 }
