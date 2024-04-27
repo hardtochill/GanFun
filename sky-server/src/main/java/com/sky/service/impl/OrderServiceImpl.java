@@ -452,4 +452,21 @@ public class OrderServiceImpl implements OrderService {
         completeOrder.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(completeOrder);
     }
+    /**
+     * 客户催单
+     * @param orderId
+     */
+    public void remind(Long orderId){
+        Orders orders = orderMapper.getById(orderId);
+        if(orders==null){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //向管理端发送提示信息
+        Map map = new HashMap();
+        map.put("type",2);//1表示来单提醒，2表示客户催单
+        map.put("orderId",orderId);
+        map.put("content","订单号："+orders.getNumber());
+        String message = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(message);
+    }
 }
