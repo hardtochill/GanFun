@@ -47,7 +47,7 @@ public interface OrderService {
     OrderVO getOrderDetails(Long orderId,Integer identity);
 
     /**
-     * 取消订单
+     * 用户取消订单
      * @param orderId
      */
     void cancelOrder(Long orderId);
@@ -76,4 +76,10 @@ public interface OrderService {
      * @param ordersConfirmDTO
      */
     void confirm(OrdersConfirmDTO ordersConfirmDTO);
+
+    /**
+     * 商家拒单
+     * @param ordersRejectionDTO
+     */
+    void reject(OrdersRejectionDTO ordersRejectionDTO);
 }

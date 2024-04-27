@@ -20,6 +20,7 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -229,7 +230,7 @@ public class OrderServiceImpl implements OrderService {
         return orderVO;
     }
     /**
-     * 取消订单
+     * 用户取消订单
      * @param orderId
      */
     public void cancelOrder(Long orderId){
@@ -355,5 +356,30 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.CONFIRMED)
                 .build();
         orderMapper.update(orders);
+    }
+    /**
+     * 商家拒单
+     * @param ordersRejectionDTO
+     */
+    public void reject(OrdersRejectionDTO ordersRejectionDTO){
+        //——1.根据订单号查询订单
+        Long orderId = ordersRejectionDTO.getId();
+        String rejectReason = ordersRejectionDTO.getRejectionReason();
+        Orders orders = orderMapper.getById(orderId);
+        //——2.查询订单状态，只有订单处于待接单状态才能取消
+        if(orders==null || !orders.getStatus().equals(Orders.TO_BE_CONFIRMED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //——3.查询订单支付状态，若订单已支付，则需要退款
+        if(orders.getPayStatus().equals(Orders.PAID)){
+            log.info("为用户退款");
+        }
+        //——4.更新订单状态
+        Orders rejectionOrder = new Orders();
+        rejectionOrder.setId(orders.getId());
+        rejectionOrder.setStatus(Orders.CANCELLED);
+        rejectionOrder.setRejectionReason(rejectReason);
+        rejectionOrder.setCancelTime(LocalDateTime.now());
+        orderMapper.update(rejectionOrder);
     }
 }
