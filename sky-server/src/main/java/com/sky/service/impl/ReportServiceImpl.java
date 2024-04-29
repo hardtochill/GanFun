@@ -1,10 +1,13 @@
 package com.sky.service.impl;
 
 import com.sky.entity.Orders;
+import com.sky.entity.User;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ import java.util.Map;
 public class ReportServiceImpl implements ReportService {
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private UserMapper userMapper;
     /**
      * 营业额统计
      * @param beginDate
@@ -68,6 +73,52 @@ public class ReportServiceImpl implements ReportService {
         return TurnoverReportVO.builder()
                 .dateList(dateListStr)
                 .turnoverList(turnoverListStr)
+                .build();
+    }
+    /**
+     * 用户数量统计
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    public UserReportVO getuserStatistics(LocalDate beginDate, LocalDate endDate){
+        //——1.获取日期
+        //获取日期集合
+        List<LocalDate> dateList = new ArrayList<>();
+        while(!beginDate.equals(endDate)){
+            dateList.add(beginDate);
+            ///****再次注意：beginDate.plusDays(1)是返回一个在beginDate基础上加一天的LodalDate，beginDate本身并不会加一天****
+            beginDate = beginDate.plusDays(1);
+        }
+        dateList.add(beginDate);
+        //拼接成字符串
+        String dateListStr = StringUtils.join(dateList,",");
+        //——2.获取用户总量、新增用户
+        //获取用户总量列表和新增用户列表
+        List<Integer> totalUserList = new ArrayList<>();
+        List<Integer> newUserList = new ArrayList<>();
+        for (LocalDate localDate : dateList) {
+            //设置每天条件日期
+            LocalDateTime beginDateTime = LocalDateTime.of(localDate, LocalTime.MIN);
+            LocalDateTime endDateTime = LocalDateTime.of(localDate, LocalTime.MAX);
+            //根据集合动态查找user表，用户总量是统计截止到当前日期的用户数，新增用户量是统计在当天时间内创建的用户数
+            Map map = new HashMap();
+            //用于查找截止至当前日期的用户总数
+            map.put("endDateTime",endDateTime);
+            Integer totalUserNum = userMapper.countByMap(map);
+            totalUserList.add(totalUserNum);
+            //用于查找新增用户数
+            map.put("beginDateTime",beginDateTime);
+            Integer newUserNum = userMapper.countByMap(map);
+            newUserList.add(newUserNum);
+        }
+        //拼接成字符串
+        String totalUserListStr = StringUtils.join(totalUserList,",");
+        String newUserListStr = StringUtils.join(newUserList,",");
+        return UserReportVO.builder()
+                .dateList(dateListStr)
+                .totalUserList(totalUserListStr)
+                .newUserList(newUserListStr)
                 .build();
     }
 }

@@ -8,4 +8,12 @@
         values
         (#{openid},#{name},#{phone},#{sex},#{idNumber},#{avatar},#{createTime})
     </insert>
+    <!--根据集合动态统计用户数量-->
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from user
+        <where>
+            <if test="beginDateTime!=null">and create_time &gt; #{beginDateTime}</if>
+            <if test="endDateTime!=null">and create_time &lt; #{endDateTime}</if>
+        </where>
+    </select>
 </mapper>
