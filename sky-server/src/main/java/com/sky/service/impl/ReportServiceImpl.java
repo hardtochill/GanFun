@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.entity.User;
 import com.sky.mapper.OrderMapper;
@@ -7,6 +8,7 @@ import com.sky.mapper.UserMapper;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.models.auth.In;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -188,5 +191,29 @@ public class ReportServiceImpl implements ReportService {
         map.put("endDateTime",endDateTime);
         map.put("status",status);
         return orderMapper.countByMap(map);
+    }
+    /**
+     * 查询销量top10
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    public SalesTop10ReportVO getSalesTop10(LocalDate beginDate, LocalDate endDate){
+        //——1.日期
+        LocalDateTime beginDateTime = LocalDateTime.of(beginDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(endDate, LocalTime.MAX);
+        //——2.获取GoodsSalesDTO集合
+        List<GoodsSalesDTO> goodsSalesDTOList = orderMapper.getSalesTop10(beginDateTime,endDateTime);
+        //——3.获取nameList：使用stream流
+        List<String> nameList = goodsSalesDTOList.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        //——4.获取numberList：使用stream流
+        List<Integer> numberList = goodsSalesDTOList.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+        //——5.拼接字符串
+        String nameListStr = StringUtils.join(nameList, ",");
+        String numberListStr = StringUtils.join(numberList, ",");
+        return SalesTop10ReportVO.builder()
+                .nameList(nameListStr)
+                .numberList(numberListStr)
+                .build();
     }
 }
