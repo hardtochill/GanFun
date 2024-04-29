@@ -34,11 +34,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     /**
      * 根据时间段统计营业数据
-     * @param begin
-     * @param end
+     * @param beginDateTime
+     * @param endDateTime
      * @return
      */
-    public BusinessDataVO getBusinessData(LocalDateTime begin, LocalDateTime end) {
+    public BusinessDataVO getBusinessData(LocalDateTime beginDateTime, LocalDateTime endDateTime) {
         /**
          * 营业额：当日已完成订单的总金额
          * 有效订单：当日已完成订单的数量
@@ -48,8 +48,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
          */
 
         Map map = new HashMap();
-        map.put("begin",begin);
-        map.put("end",end);
+        map.put("beginDateTime",beginDateTime);
+        map.put("endDateTime",endDateTime);
 
         //查询总订单数
         Integer totalOrderCount = orderMapper.countByMap(map);
@@ -92,7 +92,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      */
     public OrderOverViewVO getOrderOverView() {
         Map map = new HashMap();
-        map.put("begin", LocalDateTime.now().with(LocalTime.MIN));
+        map.put("beginDateTime", LocalDateTime.now().with(LocalTime.MIN));
         map.put("status", Orders.TO_BE_CONFIRMED);
 
         //待接单
