@@ -40,13 +40,22 @@
         </where>
         order by order_time desc
     </select>
-    <!--根据集合条件统计订单营业额-->
+    <!--根据集合条件求和订单营业额-->
     <select id="sumByMap" resultType="java.lang.Double">
         select sum(amount) from orders
         <where>
             <if test="beginDateTime!=null">and order_time &gt; #{beginDateTime}</if>
             <if test="endDateTime!=null">and order_time &lt; #{endDateTime}</if>
             <if test="status!=null">and status = #{status}</if>
+        </where>
+    </select>
+    <!--根据集合内条件统计订单数-->
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="beginDateTime!=null">and order_time &gt; #{beginDateTime}</if>
+            <if test="endDateTime!=null">and order_time &lt; #{endDateTime}</if>
+            <if test="status!=null">and status=#{status}</if>
         </where>
     </select>
 </mapper>
