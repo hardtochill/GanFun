@@ -8,6 +8,7 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.BaseException;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -70,6 +71,9 @@ public class DishServiceImpl implements DishService {
         Dish dish =  dishMapper.selectById(id);
         //根据口味id查询口味数据
         List<DishFlavor> dishFlavors = dishFlavorMapper.selectByDishId(id);
+        if(dish==null){
+            throw new BaseException("菜品不存在");
+        }
         //设置dishVO对象
         DishVO dishVO = new DishVO();
         BeanUtils.copyProperties(dish,dishVO);
